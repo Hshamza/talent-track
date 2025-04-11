@@ -9,6 +9,7 @@ import {
   generateId,
   getCurrentDate,
 } from "@/lib/data"
+import { toast } from "sonner"
 
 // Storage keys
 const STORAGE_KEYS = {
@@ -182,6 +183,7 @@ export const getCandidatesByRole = (roleId: string): Candidate[] => {
 }
 
 export const findCandidateByEmailOrPhone = (email: string, phone?: string): Candidate | null => {
+  debugger;
   const candidates = getCandidates()
   return (
     candidates.find(
@@ -193,44 +195,24 @@ export const findCandidateByEmailOrPhone = (email: string, phone?: string): Cand
 }
 
 export const createCandidate = (candidate: Omit<Candidate, "id" | "appliedDate">): Candidate => {
-  const candidates = getCandidates()
-  const role = getRole(candidate.roleId)
-
-  if (!role) throw new Error("Role not found")
-
-  const newCandidate: Candidate = {
-    ...candidate,
-    id: generateId(),
-    appliedDate: getCurrentDate(),
-    roleName: role.title,
-    notes: [],
-    applicationHistory: [
-      {
-        id: generateId(),
-        roleId: candidate.roleId,
-        roleName: role.title,
-        date: getCurrentDate(),
-        stage: candidate.stage,
-        matchScore: candidate.matchScore,
-      },
-    ],
+  try {
+    const { candidate: handledCandidate } = handleCandidateApplication({
+      ...candidate,
+      name: candidate.name,
+      email: candidate.email,
+      phone: candidate.phone,
+      location: candidate.location,
+      roleId: candidate.roleId,
+      skills: candidate.skills,
+      experience: candidate.experience,
+      education: candidate.education,
+      matchScore: candidate.matchScore,
+      coverLetter: candidate.coverLetter,
+    });
+    return handledCandidate;
+  } catch (error: any) {
+    throw new Error(error.message);
   }
-
-  candidates.push(newCandidate)
-  localStorage.setItem(STORAGE_KEYS.CANDIDATES, JSON.stringify(candidates))
-
-  // Add activity
-  addActivity({
-    type: "candidate_applied",
-    description: `${newCandidate.name} applied for ${newCandidate.roleName} position`,
-    candidateId: newCandidate.id,
-    roleId: newCandidate.roleId,
-  })
-
-  // Update dashboard
-  updateDashboardStats()
-
-  return newCandidate
 }
 
 export const updateCandidate = (id: string, updates: Partial<Candidate>): Candidate | null => {

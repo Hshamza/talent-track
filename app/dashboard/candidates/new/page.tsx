@@ -77,6 +77,7 @@ export default function NewCandidatePage() {
         ...values,
         roleName: '',
         notes: [],
+        skills: [],
       });
 
       if (Array.isArray(newCandidate)) {

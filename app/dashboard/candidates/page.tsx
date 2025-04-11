@@ -114,7 +114,7 @@ export default function CandidatesPage() {
     <div className="p-6 space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Candidates</h1>
-        <Button onClick={() => router.push("/dashboard/candidates/add-new")}>
+        <Button onClick={() => router.push("/dashboard/candidates/new")}>
           <PlusCircle className="mr-2 h-4 w-4" />
           Add Candidate
         </Button>
